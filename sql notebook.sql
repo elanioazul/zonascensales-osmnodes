@@ -244,3 +244,49 @@ with open('output_data_cleaned.csv', encoding="utf8", mode='r') as f:
             row
         )
 conn.commit() # to commit chenges and create the table
+
+
+SELECT
+	t1_1
+FROM
+	indicadores_madrid as indicadores
+INNER JOIN secciones_madrid_deinteres as zonascensales
+ON (indicadores.ccaa = zonascensales.cca and indicadores.cpro = zonascensales.cpro and indicadores.cmun = zonascensales.cmun and indicadores.dist = zonascensales.cdis and indicadores.secc = zonascensales.csec);
+
+
+
+SELECT
+	indicadores.t1_1,
+	indicadores.cmun,
+	indicadores.dist,
+	indicadores.secc,
+	zonascensales.geom,
+	zonascensales.cmun,
+	zonascensales.cdis,
+	zonascensales.csec,
+	zonascensales.nmun,
+	zonascensales.shape_area
+FROM
+	indicadores_madrid as indicadores
+INNER JOIN secciones_madrid_deinteres as zonascensales
+ON (indicadores.ccaa = zonascensales.cca and indicadores.cpro = zonascensales.cpro and indicadores.cmun = zonascensales.cmun and indicadores.dist = zonascensales.cdis and indicadores.secc = zonascensales.csec);
+
+
+
+
+CREATE TABLE indicadores_zonascensales_join AS
+SELECT
+	indicadores.t1_1 as t1_1_indic,
+	indicadores.cmun as cmun_indic,
+	indicadores.dist as dist_indic,
+	indicadores.secc as secc_indic,
+	zonascensales.geom,
+	zonascensales.cmun as cmun_zonas,
+	zonascensales.cdis as cdis_zonas,
+	zonascensales.csec as csec_zonas,
+	zonascensales.nmun as nmun_zonas,
+	zonascensales.shape_area
+FROM
+	indicadores_madrid as indicadores
+INNER JOIN secciones_madrid_deinteres as zonascensales
+ON (indicadores.ccaa = zonascensales.cca and indicadores.cpro = zonascensales.cpro and indicadores.cmun = zonascensales.cmun and indicadores.dist = zonascensales.cdis and indicadores.secc = zonascensales.csec);
