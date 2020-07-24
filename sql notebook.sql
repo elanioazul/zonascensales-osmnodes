@@ -281,6 +281,8 @@ SELECT
 	indicadores.dist as dist_indic,
 	indicadores.secc as secc_indic,
 	zonascensales.geom,
+	zonascensales.id as id_zonas,
+	zonascensales.objectid as objectid_zonas,
 	zonascensales.cmun as cmun_zonas,
 	zonascensales.cdis as cdis_zonas,
 	zonascensales.csec as csec_zonas,
@@ -290,3 +292,38 @@ FROM
 	indicadores_madrid as indicadores
 INNER JOIN secciones_madrid_deinteres as zonascensales
 ON (indicadores.ccaa = zonascensales.cca and indicadores.cpro = zonascensales.cpro and indicadores.cmun = zonascensales.cmun and indicadores.dist = zonascensales.cdis and indicadores.secc = zonascensales.csec);
+
+
+--Spatial JOIN / Intersect
+CREATE TABLE comercios_por_zonacensal as
+SELECT z.objectid_zonas,  COUNT (*) as nodes_count
+FROM indicadores_zonascensales_join as z
+	JOIN comercios_alimentacion as c
+	ON ST_INTERSECTS(z.geom, c.geom)
+	GROUP BY z.objectid_zonas
+	ORDER BY nodes_count DESC
+--Resultado: de las 506 zonas censales escogidas, hay comercios registrados en osm en sólo 228 de ellas.
+
+
+--Cambio el nombre del campo objectid_zonas a objid y ambos campos el datatype de bigint a integer:
+ALTER TABLE comercios_por_zonacensal
+RENAME COLUMN objectid_zonas TO objid_zonas;
+
+ALTER TABLE comercios_por_zonacensal
+ALTER COLUMN objid_zonas TYPE INT,
+ALTER COLUMN nodes_count TYPE INT;
+
+
+--Ahora me tengo que llevar el counting de comercios a la tabla de indicadores_zonascensales_join mediante un outer join con el campo comun de ambas tablas "objectid":
+CREATE TABLE indicadores_zonascenso_comercios as
+SELECT * FROM indicadores_zonascensales_join as z
+LEFT OUTER JOIN comercios_por_zonacensal c
+ON z.objectid_zonas = c.objid_zonas;
+
+--Creo un nuevo campo para el indice que se pide:
+ALTER TABLE indicadores_zonascenso_comercios
+ADD COLUMN indice real;
+
+
+--Ahora seria dividir num hab entre num comercios * 100,tal y como dice el pdf
+--
