@@ -294,7 +294,7 @@ INNER JOIN secciones_madrid_deinteres as zonascensales
 ON (indicadores.ccaa = zonascensales.cca and indicadores.cpro = zonascensales.cpro and indicadores.cmun = zonascensales.cmun and indicadores.dist = zonascensales.cdis and indicadores.secc = zonascensales.csec);
 
 
---Spatial JOIN / Intersect
+--Spatial JOIN / Intersect para counting
 CREATE TABLE comercios_por_zonacensal as
 SELECT z.objectid_zonas,  COUNT (*) as nodes_count
 FROM indicadores_zonascensales_join as z
@@ -302,7 +302,7 @@ FROM indicadores_zonascensales_join as z
 	ON ST_INTERSECTS(z.geom, c.geom)
 	GROUP BY z.objectid_zonas
 	ORDER BY nodes_count DESC
---Resultado: de las 506 zonas censales escogidas, hay comercios registrados en osm en sólo 228 de ellas.
+--Resultado: de las 506 zonas censales escogidas, hay comercios registrados en osm en sólo 228 de ellas. 278 no tienen comercios alimentacion.
 
 
 --Cambio el nombre del campo objectid_zonas a objid y ambos campos el datatype de bigint a integer:
@@ -313,6 +313,13 @@ ALTER TABLE comercios_por_zonacensal
 ALTER COLUMN objid_zonas TYPE INT,
 ALTER COLUMN nodes_count TYPE INT;
 
+----Spatial JOIN / Intersect para geometrias:
+CREATE TABLE comercios_por_zonacensal_geometrias as
+SELECT c.id, c.geom, c.amenity, c.brand, c.cuisine, c.name, c.id_2, c.shop
+FROM indicadores_zonascensales_join as z
+	JOIN comercios_alimentacion as c
+	ON ST_INTERSECTS(z.geom, c.geom)
+
 
 --Ahora me tengo que llevar el counting de comercios a la tabla de indicadores_zonascensales_join mediante un outer join con el campo comun de ambas tablas "objectid":
 CREATE TABLE indicadores_zonascenso_comercios as
@@ -320,10 +327,12 @@ SELECT * FROM indicadores_zonascensales_join as z
 LEFT OUTER JOIN comercios_por_zonacensal c
 ON z.objectid_zonas = c.objid_zonas;
 
+
+
 --Creo un nuevo campo para el indice que se pide:
-ALTER TABLE indicadores_zonascenso_comercios
-ADD COLUMN indice real;
+ALTER TABLE indicadores_zonascenso_comercios ADD tfm_indice numeric(5, 3);
+--Ahora seria dividir num hab entre num comercios * 100,tal y como dice el pdf, o al reves, num comercios/habitantes *100:
+UPDATE indicadores_zonascenso_comercios 
+SET tfm_indice = (nodes_count/t1_1_indic::numeric)*1000;
+--NOTA: multiplico por 1000 y no por 100 por la misma razon de Eduardo en su duda al Foro.
 
-
---Ahora seria dividir num hab entre num comercios * 100,tal y como dice el pdf
---
