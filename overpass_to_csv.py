@@ -1,7 +1,7 @@
 """
 
 
-author : @hugo h.
+author : @eduardo.
 created : 20,July,2020
 description : data_task_02 to perform data fetch operations on Open Street Map through overpy.Overpass() API 
 requirements : overpy==0.4 (pip install overpy)

@@ -1,7 +1,7 @@
 """
 
 
-author : @hugo h.
+author : @eduardo.
 created : 21,July,2020
 description : data_task_02 to perform data fetch operations on Open Street Map through overpy.Overpass() API 
 requirements : psycop2 (pip install)

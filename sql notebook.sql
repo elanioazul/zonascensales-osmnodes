@@ -334,5 +334,5 @@ ALTER TABLE indicadores_zonascenso_comercios ADD tfm_indice numeric(5, 3);
 --Ahora seria dividir num hab entre num comercios * 100,tal y como dice el pdf, o al reves, num comercios/habitantes *100:
 UPDATE indicadores_zonascenso_comercios 
 SET tfm_indice = (nodes_count/t1_1_indic::numeric)*1000;
---NOTA: multiplico por 1000 y no por 100 por la misma razon de Eduardo en su duda al Foro.
+--NOTA: multiplico por 1000 y no por 100 como he leido en el foro.
 
