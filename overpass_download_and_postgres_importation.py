@@ -21,9 +21,9 @@ import psycopg2           # to import the psqcopy library/driver
 
 #this function gets the input from user.  INPUT = {laitutde, longitude, search_radius, option to specify the data domain like hospital,education etc.}
 def get_input():
-	print("\nEnter latitude (example->'40.584569') >> ")
+	print("\nEnter latitude (example->'40.416981') >> ")
 	latitude = input()
-	print("\nEnter longitude (example->'-3.215868') >> ")
+	print("\nEnter longitude (example->'-3.703218') >> ")
 	longitude = input()
 	print("\nEnter scan radius for target.(in meters) (EXAMPLE->'20000') >> ")
 	search_radius = input()
@@ -125,8 +125,8 @@ def csv_data_into_postgres():
 	conn = psycopg2.connect("host=localhost dbname=tfm_unigis user=postgres password='postgres_hhc'")
 	cur = conn.cursor()
 	cur.execute("""
-		CREATE TABLE comercios_alimentacion (
-		id text PRIMARY KEY, 
+		CREATE TABLE comercios_alimentacion_video (
+		id integer PRIMARY KEY, 
 		amenity text,
 		brand text,
 		brand_wikidata text,
@@ -158,8 +158,6 @@ def csv_data_into_postgres():
 		old_name text,
 		alt_name text,
 		website text,
-		old_name_2013 text,
-		old_name_2013_2018 text,
 		opening_hours text,
 		phone text,
 		wikidata text,
@@ -277,14 +275,7 @@ def csv_data_into_postgres():
 		addr_place text,
 		payment_meal_voucher text,
 		bakery text,
-		payment_telephone_cards text,
-		payment_twyp text,
-		name_ja text,
-		beacon_type text,
-		indoormark text,
-		payment_cards text,
-		start_date text,
-		name_it text
+		payment_telephone_cards text
 	)
 	""")
 	with open('output_data.csv', encoding="utf8", mode='r') as f:
@@ -292,12 +283,12 @@ def csv_data_into_postgres():
 		next(reader) # Skip the header row.
 		for row in reader:
 			cur.execute(
-				"INSERT INTO comercios_alimentacion VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+				"INSERT INTO comercios_alimentacion_video VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
 				row
 			)
 	cur.execute ("""
-		ALTER TABLE comercios_alimentacion ADD COLUMN geom geometry(Point, 4326);
-		UPDATE comercios_alimentacion SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
+		ALTER TABLE comercios_alimentacion_video ADD COLUMN geom geometry(Point, 4326);
+		UPDATE comercios_alimentacion_video SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
 	""")
 	conn.commit() # to commit changes and create the table
 
